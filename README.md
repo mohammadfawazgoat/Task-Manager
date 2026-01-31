@@ -51,9 +51,22 @@ Built using **Flask**, **SQLite**, and **Vanilla JavaScript**, following REST AP
 
 ## ⚙️ Setup Instructions
 
-### 1️⃣ Clone the repository
-```bash
-git clone https://github.com/mohammadfawazgoat/Task-Manager
-cd task-manager
+## 📂 How to Run This Project Locally
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/mohammadfawazgoat/Task-Manager
+
+2. **Navigate to the project directory**
+   ```bash
+   cd Task-Manager
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+
+4. **Run the App**
+   ```bash
+   python app.py
 
 
