@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Task Manager</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <link rel = "icon" href="/static/images/icon.png" >
+    </head>    
+
+
+    <body>
+        <h1>Task Manager</h1>
+        <div class = "container">
+            <div class = "task_cont">
+                <p>Add Task</p>
+                <form action="/add" method="post">
+                    <input name = "taskname" type="text" id = "tasktitle" placeholder="Task Title" autocomplete = "off" required>
+                    <input name = "desc" type = "text" id = "desc" placeholder="Description" autocomplete="off" required>
+                    <div id = "options">
+                    <select name = "status" id="status" required>
+                        <option class = "opt" disabled selected value>Status</option>
+                        <option class = "opt" value="Pending">Pending</option>
+                        <option class = "opt" value="Completed">Completed</option>
+                    </select>
+                    <button id = "btn" type = "submit">Add Task</button>
+                    </div>
+                </form>    
+            </div>
+        </div>
+        <div>
+            <h1>Track List</h1>
+            {% for task in tasks %}
+                <div class = "flextask">
+                    <div class="task">
+                        <div class = "asflex">
+                            <h2>{{ task['taskname'] }}</h2>
+                            <div class="stt {% if task['status'] == 'Completed' %}completed{% else %}pending{% endif %}">
+                                {{ task['status'] }}
+                            </div> 
+                        </div>
+                        <p>{{ task['description'] }}</p>
+                        <div id = "ss">
+                        <form action = "/change" method = "post">
+                            <input type="hidden" name="taskid" value="{{ task['id'] }}">
+                            <select name = "cstatus" id="cstatus">
+                                <option class = "copt" disabled selected value>{{ task['status'] }}</option>
+                                {% if task['status'] == 'Pending' %}
+                                    <option class = "copt" value="Completed">Completed</option>
+                                {% else %}
+                                    <option class = "copt" value="Pending">Pending</option>
+                                {% endif %}
+                            </select>
+                            <button class = "cbtn"type = "submit">Update Status</button>
+                        </form>
+                        
+                        
+                        <div id = "dd">
+                            <form action="/edit" method="post" class="edit-trigger">
+                                <input type="hidden" name="taskide" value="{{ task['id'] }}">
+                                <button class = "ebtn" type = "submit">Edit Task</button>
+                            </form>
+
+                            <form action = "/delete" method = "post">
+                                <input type="hidden" name="taskidd" value="{{ task['id'] }}">
+                                    <button class = "dbtn" type = "submit">Delete Task</button>
+                            </form> 
+                        </div> 
+                        <div>
+                            
+                        </div>
+                        </div>
+                        
+                           
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+<div id="editModal" class="modal" aria-hidden="true" style="display:none;">
+  <div class="modal-inner">
+    <form id="editForm" action="/edit" method="post">
+      <input type="hidden" name="taskid" id="modalTaskId">
+      <label>Name <input name="taskname" id="modalName" required></label>
+      <label>Description <textarea name="desc" id="modalDesc" required></textarea></label>
+      <label>Status
+        <select name="status" id="modalStatus" required>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button type="button" id="modalCancel">Cancel</button>
+        <button id = "s" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('form').forEach(form => {
+        const sel = form.querySelector('select');
+        const btn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (!btn) return;
+
+        
+        if (!sel) return;
+
+        
+        btn.disabled = true;
+        const update = () => {
+          const opt = sel.options[sel.selectedIndex];
+          const valid = opt && !opt.disabled && opt.value !== '' && opt.value !== undefined;
+          btn.disabled = !valid;
+        };
+
+        sel.addEventListener('change', update);
+        update();
+      });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('editModal');
+  const form = document.getElementById('editForm');
+  const idEl = document.getElementById('modalTaskId');
+  const nameEl = document.getElementById('modalName');
+  const descEl = document.getElementById('modalDesc');
+  const statusEl = document.getElementById('modalStatus');
+  const cancel = document.getElementById('modalCancel');
+
+  function openModal(){
+    modal.setAttribute('aria-hidden', 'false');
+    modal.style.display = 'flex';
+    setTimeout(() => nameEl.focus(), 50);
+  }
+  function closeModal(){
+    modal.setAttribute('aria-hidden', 'true');
+    modal.style.display = 'none';
+  }
+
+  document.querySelectorAll('form.edit-trigger').forEach(f => {
+    f.addEventListener('submit', e => {
+      e.preventDefault();               
+      const taskId = f.querySelector('input[name="taskide"]').value;
+      const row = f.closest('.task');
+      const name = row.querySelector('h2').textContent.trim();
+      const description = row.querySelector('p').textContent.trim();
+      const status = row.querySelector('.stt').textContent.trim();
+
+      idEl.value = taskId;
+      nameEl.value = name;
+      descEl.value = description;
+      statusEl.value = (status === 'Completed') ? 'Completed' : 'Pending';
+
+      // ensure the modal Save button is enabled when we populate the form
+      const saveBtn = form.querySelector('button[type="submit"]');
+      if (saveBtn) {
+        const opt = statusEl.options[statusEl.selectedIndex];
+        const valid = opt && !opt.disabled && opt.value !== '' && opt.value !== undefined;
+        saveBtn.disabled = !valid;
+      }
+
+      openModal();
+    });
+  });
+
+  cancel.addEventListener('click', closeModal);
+  modal.addEventListener('click', (ev) => { if (ev.target === modal) closeModal(); });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeModal(); });
+});
+    </script>
+
+    </body>
+</html>
