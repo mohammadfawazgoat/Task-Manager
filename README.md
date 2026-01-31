@@ -35,3 +35,25 @@ Built using **Flask**, **SQLite**, and **Vanilla JavaScript**, following REST AP
 
 ---
 
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint        | Description        |
+|------|-----------------|--------------------|
+| GET  | `/tasks`        | Fetch all tasks    |
+| POST | `/tasks`        | Create a new task  |
+| PUT  | `/tasks/<id>`   | Update a task      |
+| DELETE | `/tasks/<id>` | Delete a task      |
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/mohammadfawazgoat/Task-Manager
+cd task-manager
+
+
